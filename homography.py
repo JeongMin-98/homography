@@ -11,7 +11,7 @@ from calibration_parser import calibration_parser
 
 if __name__ == "__main__":
     # calibration_json_filepath = os.path.join("json", "calibration.json")
-    camera_matrix = calibration_parser.read_json_file("json/calibration.json")
+    camera_matrix, _ = calibration_parser.read_json_file("json/calibration168.json")
     image = cv2.imread("img/homography1_homography.jpg", cv2.IMREAD_ANYCOLOR)
 
     # extrinsic -> homography src, dst
@@ -116,7 +116,7 @@ if __name__ == "__main__":
     print(homography)
     print("=========================")
 
-    np.save('test.npy', homography)
+    np.save('calibration168.npy', homography)
     # print(proj_image_points.shape)
 
     # (u, v) -> (u, v, 1)

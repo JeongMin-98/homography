@@ -26,8 +26,12 @@ def parse_distortion_calibration(distortion):
     k2 = distortion['k2']
     p1 = distortion['p1']
     p2 = distortion['p2']
-
-    return [k1, k2, p1, p2]
+    distortion = np.zeros([4], dtype=np.float32)
+    distortion[0] = k1
+    distortion[1] = k2
+    distortion[2] = p1
+    distortion[3] = p2
+    return distortion
 
 
 def parse_intrinsic_calibration(intrinsic):
