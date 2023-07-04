@@ -11,12 +11,23 @@ def read_json_file(path):
 
     intrinsic = calibration_json["intrinsic"]
     print("Intrinsic Calibration\n", intrinsic)
+    distortion = calibration_json['distortion']
     # extrinsic = calibration_json["extrinsic"]
     # print("Extrinsic Calibration\n", extrinsic)
 
     camera_matrix = parse_intrinsic_calibration(intrinsic)
+    distortion = parse_distortion_calibration(distortion)
 
-    return camera_matrix
+    return camera_matrix, distortion
+
+
+def parse_distortion_calibration(distortion):
+    k1 = distortion['k1']
+    k2 = distortion['k2']
+    p1 = distortion['p1']
+    p2 = distortion['p2']
+
+    return [k1, k2, p1, p2]
 
 
 def parse_intrinsic_calibration(intrinsic):
