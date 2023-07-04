@@ -3,6 +3,51 @@
 import numpy as np
 import cv2
 import time
+from calibration_parser import calibration_parser
+
+# 원본 이미지 크기
+Width = 640
+Height = 480
+
+cap = cv2.VideoCapture('D:/devcourse/ProjectDataset/track2.mp4')
+window_title = 'camera'
+
+# warp할 영상의 이미지 크기
+warp_img_w = Width // 2
+warp_img_h = Height // 2
+x_center = 320
+
+# ---------------------------
+
+
+warpx_margin = 20
+warpy_margin = 3
+
+warpx_top_margin = 75
+warpx_bottom_margin = 300
+
+warpy = 310
+warpy_h = 120
+
+warp_src1 = np.array([
+    [x_center - warpx_top_margin, warpy],
+    [x_center - warpx_bottom_margin, warpy + warpy_h],
+    [x_center + warpx_top_margin, warpy],
+    [x_center + warpx_bottom_margin, warpy + warpy_h]
+], dtype=np.float32)
+
+warp_dist = np.array([
+    [0, 0],
+    [0, warp_img_h],
+    [warp_img_w, 0],
+    [warp_img_w, warp_img_h],
+], dtype=np.float32)
+
+calibrated = True
+if calibrated:
+
+    mtx, dist = calibration_parser.read_json_file('json/calibration168.json')
+    cal_mtx, cal_roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (Width, Height), 1, (Width, Height))
 
 
 def calibrate_image(frame):
@@ -53,52 +98,6 @@ def draw_line(warp, image):
     return image
 
 
-Width = 640
-Height = 480
-
-cap = cv2.VideoCapture('track2.mp4')
-window_title = 'camera'
-
-warp_img_w = Width // 2
-warp_img_h = Height // 2
-
-# ---------------------------
-
-warpx_margin = 20
-warpy_margin = 3
-
-warpx_top_margin = 75
-warpx_bottom_margin = 300
-
-warpy = 310
-warpy_h = 120
-
-warp_src1 = np.array([
-    [320 - warpx_top_margin, warpy],
-    [320 - warpx_bottom_margin, warpy + warpy_h],
-    [320 + warpx_top_margin, warpy],
-    [320 + warpx_bottom_margin, warpy + warpy_h]
-], dtype=np.float32)
-
-warp_dist = np.array([
-    [0, 0],
-    [0, warp_img_h],
-    [warp_img_w, 0],
-    [warp_img_w, warp_img_h],
-], dtype=np.float32)
-
-calibrated = True
-if calibrated:
-    mtx = np.array([
-        [422.037858, 0.0, 245.895397],
-        [0.0, 435.589734, 163.625535],
-        [0.0, 0.0, 1.0],
-    ])
-    dist = np.array([-0.289296, 0.061035, 0.001786, 0.015238, 0.0])
-
-    cal_mtx, cal_roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (Width, Height), 1, (Width, Height))
-
-
 def start():
     global Width, Height, cap
 
@@ -117,7 +116,7 @@ def start():
         warp_img, M, Minv = warp_image(image,
                                        warp_src1,
                                        warp_dist,
-                                       (Width, Height*2))
+                                       (Width, Height * 2))
         cv2.imshow('warp', warp_img)
 
         image = draw_line(warp_src1, image)
