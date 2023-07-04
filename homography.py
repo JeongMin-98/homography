@@ -59,35 +59,37 @@ if __name__ == "__main__":
 
     # X Y Z, X -> down, Z -> forward, Y -> Right
     # 실측이 중요하다.
-    gap = 0.450
-    camera_height = -0.1550
+    # BEV의 바닥 픽셀 값의 실측값은 45cm이기 때문에 0.45로 구한다.
+    gap = 0.45
+    camera_height = -0.155
     # 자이카 기준 왼쪽, 오른쪽
-    left_side = -0.2750
-    right_side = 0.2750
+    left_side = -0.275
+    right_side = 0.275
 
     # 자이카 기준 1번 ~ 3번째 줄
-    first = 0.450
+    first = 0.45
     second = first + gap
     third = second + gap
     last = third + gap
     object_points = np.array([
-        [camera_height, left_side, first],
-        [camera_height, right_side, first],
-        [camera_height, left_side, second],
+        [camera_height, left_side, first], # 첫번째 줄 왼쪽 도미노
+        [camera_height, right_side, first], # 첫번째 줄 오른쪽 도미노
+        [camera_height, left_side, second], # 두번째 줄 도미노
         [camera_height, right_side, second],
         [camera_height, left_side - gap, second],
         [camera_height, right_side + gap, second],
-        [camera_height, left_side, third],
+        [camera_height, left_side, third], # 세 번째 줄 도미노
         [camera_height, right_side, third],
         [camera_height, left_side - gap, third],
         [camera_height, right_side + gap, third],
-        [camera_height, left_side, last],
+        [camera_height, left_side, last], # 네 번째(마지막) 줄 도미노
         [camera_height, right_side, last],
         [camera_height, left_side - gap, last],
         [camera_height, right_side + gap, last],
 
     ], dtype=np.float32)
 
+    # 객체의 픽셀 값과 위치 값의 수
     DATA_SIZE = 14
     homo_object_point = np.append(object_points[:, 2:3], -object_points[:, 1:2], axis=1)
     homo_object_point = np.append(homo_object_point, np.ones([1, DATA_SIZE]).T, axis=1)
@@ -110,6 +112,11 @@ if __name__ == "__main__":
     # proj_image_points, _ = cv2.projectPoints(object_points, rvec, tvec, camera_matrix, None)
 
     homography, _ = cv2.findHomography(image_points, homo_object_point)
+    print("homography : ")
+    print(homography)
+    print("=========================")
+
+    np.save('test.npy', homography)
     # print(proj_image_points.shape)
 
     # (u, v) -> (u, v, 1)
@@ -127,4 +134,3 @@ if __name__ == "__main__":
         print('distance: ', distance)
         print(x / z, y / z, z / z)
 
-    # 여기서 중요한 점
